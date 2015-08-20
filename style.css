@@ -1,0 +1,27 @@
+h1 {
+  text-align: center;
+}
+
+caption {
+    text-align: center;
+}
+
+.content {
+    margin: 25px 25px 25px 25px;
+}
+
+.cur-table {
+    left: 50%;
+    margin-left: -150px;
+    position: relative;
+}
+
+.bs-example {
+    width: 300px;
+    float: left;
+    position: relative;
+}
+
+.clear {
+    clear: both;
+}
