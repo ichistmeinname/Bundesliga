@@ -130,23 +130,27 @@ tableToTip table = map (\tInfo -> (teamName tInfo,position tInfo)) tInfos
 -- HTML stuff
 
 mkTipsTable :: (Player,[((Team,Pos),Points)]) -> HtmlExp
-mkTipsTable (name,tipAndPoints) =
-  blockstyle "bs-example" [tableWithCaption ["#","Verein", "Punkte"] (show name) posAndTeams]
+mkTipsTable info@(name,tipAndPoints) =
+  mkTable "bs-example" (show name) ["#","Verein", "Punkte"] posAndTeams tipAndPoints
  where
-  posAndTeams = map (\ ((team,pos),points) -> [[HtmlText (show pos)]
-                                             ,[HtmlText (show team)]
-                                             ,[HtmlText (show points)]])
-                    tipAndPoints
+  posAndTeams ((team,pos),points) =
+    [[HtmlText (show pos)]
+    ,[HtmlText (show team)]
+    ,[HtmlText (show points)]]
 
 mkPlayerTable :: [(Player,Points)] -> [HtmlExp]
 mkPlayerTable pair =
-  [blockstyle "bs-example cur-table" [tableWithCaption ["#","Tipper", "Punkte"] "Tabellenstand" table]]
+  [mkTable "bs-example cur-table" "Tabellenstand" ["#","Tipper", "Punkte"] table (zip pair [1..])]
      ++ [blockstyle "clear" []]
  where
-  table = map (\ ((name,points),pos) -> [[HtmlText (show pos)]
-                                        ,[HtmlText (show name)]
-                                        ,[HtmlText (show points)]])
-              (zip pair [1..])
+  table ((name,points),pos) =
+    [[HtmlText (show pos)]
+    ,[HtmlText (show name)]
+    ,[HtmlText (show points)]]
+
+mkTable :: String -> String -> [String] -> (a -> [[HtmlExp]]) -> [a] -> HtmlExp
+mkTable htmlClass caption tableCaptions f info =
+  blockstyle htmlClass [tableWithCaption tableCaptions caption (map f info)]
 
 tableWithCaption :: [String] -> String -> [[[HtmlExp]]] -> HtmlExp
 tableWithCaption header caption items = HtmlStruct "table" [("class","table")]
@@ -160,7 +164,7 @@ mkPage :: [(Player,[((Team,Pos),Points)])] -> [(Player,Points)] -> HtmlPage
 mkPage info table = HtmlPage "Saison Spektakel 15/16" cssParams [content]
  where
   content = blockstyle "content" ([title] ++ mkPlayerTable table ++ map mkTipsTable info ++ [blockstyle "clear" []])
-  cssParams = [ PageCSS "bootstrap-3.3.5/css/bootstrap.min.css"
+  cssParams = [ PageCSS "bootstrap/dist/css/bootstrap.min.css"
              , PageCSS "style.css"]
   title = h1 [HtmlText "Saison Spektakel 2015/16"] `addClass` "jumbotron"
 
